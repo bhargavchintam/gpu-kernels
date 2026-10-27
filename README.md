@@ -2,6 +2,13 @@
 
 CUDA and Triton kernels for the usual deep-learning primitives, plus the notes I keep on GPU performance.
 
+<p align="center">
+  <img src="docs/media/demo.gif" alt="The shared-memory tiled GEMM kernel, then all 15 NumPy reference checks passing" width="860">
+</p>
+
+Companion repo: [llm-inference](https://github.com/bhargavchintam/llm-inference) builds the serving side (KV cache,
+paged attention, continuous batching, speculative decoding) on top of these primitives, in NumPy.
+
 ```
 cuda/        CUDA kernels (.cu) - GEMM, reductions, softmax, layernorm, flash attention, ...
 triton/      the same primitives as Triton @jit kernels
