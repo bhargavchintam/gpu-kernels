@@ -22,15 +22,16 @@ CI has no GPU, so it does not run the kernels. A pull request is ready when `che
    `PASS <name> max_err=<value>` or `FAIL <name> max_err=<value>`.
 3. Add the NumPy reference as `reference/16-split-k-gemm.py`, with the same number and name:
    - write the algorithm the way the kernel does it (the same tiles, loop order or reduction tree);
-   - seed the inputs with `np.random.seed(...)` so the numbers are the same on every run;
+   - seed the inputs with `np.random.seed(...)` so every run uses the same inputs;
    - compare against a plain NumPy expression and `assert` a tight tolerance;
    - print one line that starts with `PASS`, the name and `max_err`. For example,
-     `reference/06-gemm-tiled.py` prints `PASS gemm-tiled max_err=9.537e-06`.
+     `reference/08-softmax.py` prints `PASS softmax max_err=2.384e-07`.
 
    NumPy is the only dependency. `check_all.py` picks up new files in `reference/` on its own.
 4. Optional: add a Triton version as `triton/NN-name.py`, with the `@triton.jit` kernel and a small Python
    function that launches it. Triton files have their own numbering.
-5. Add a row to the table in [README.md](README.md) with the `max_err` your reference prints.
+5. Add a row to the table in [README.md](README.md) with the `max_err` your reference prints in CI. If CI jobs
+   print different values, list both.
 6. If the kernel needs explaining, add or extend a note in `docs/`.
 
 Check that the CUDA file builds:

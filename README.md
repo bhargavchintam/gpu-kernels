@@ -46,14 +46,14 @@ file.
 | SAXPY | [`02-saxpy.cu`](cuda/02-saxpy.cu) | — | [`02-saxpy.py`](reference/02-saxpy.py) vs `a * x + y` | 0.000e+00 |
 | Sum reduction (warp shuffle) | [`03-reduction-sum.cu`](cuda/03-reduction-sum.cu) | — | [`03-reduction-sum.py`](reference/03-reduction-sum.py) vs `np.sum` | 0.000e+00 |
 | Transpose (padded shared-memory tile) | [`04-transpose.cu`](cuda/04-transpose.cu) | — | [`04-transpose.py`](reference/04-transpose.py) vs `a.T` | 0.000e+00 |
-| GEMM, naive | [`05-gemm-naive.cu`](cuda/05-gemm-naive.cu) | — | [`05-gemm-naive.py`](reference/05-gemm-naive.py) vs `a @ b` | 1.907e-06 |
-| GEMM, tiled | [`06-gemm-tiled.cu`](cuda/06-gemm-tiled.cu) | [`03-matmul.py`](triton/03-matmul.py) | [`06-gemm-tiled.py`](reference/06-gemm-tiled.py) vs `a @ b` | 9.537e-06 |
+| GEMM, naive | [`05-gemm-naive.cu`](cuda/05-gemm-naive.cu) | — | [`05-gemm-naive.py`](reference/05-gemm-naive.py) vs `a @ b` | 1.907e-06 or 2.861e-06 |
+| GEMM, tiled | [`06-gemm-tiled.cu`](cuda/06-gemm-tiled.cu) | [`03-matmul.py`](triton/03-matmul.py) | [`06-gemm-tiled.py`](reference/06-gemm-tiled.py) vs `a @ b` | 9.537e-06 or 7.629e-06 |
 | GEMM, coalesced loads | [`07-gemm-coalesced.cu`](cuda/07-gemm-coalesced.cu) | — | [`07-gemm-coalesced.py`](reference/07-gemm-coalesced.py) vs `a @ b` | 3.815e-06 |
 | Softmax (online) | [`08-softmax.cu`](cuda/08-softmax.cu) | [`02-fused-softmax.py`](triton/02-fused-softmax.py) | [`08-softmax.py`](reference/08-softmax.py) vs stable softmax | 2.384e-07 |
 | LayerNorm | [`09-layernorm.cu`](cuda/09-layernorm.cu) | [`04-layernorm.py`](triton/04-layernorm.py) | [`09-layernorm.py`](reference/09-layernorm.py) vs the vectorized formula | 0.000e+00 |
 | RMSNorm | [`10-rmsnorm.cu`](cuda/10-rmsnorm.cu) | [`05-rmsnorm.py`](triton/05-rmsnorm.py) | [`10-rmsnorm.py`](reference/10-rmsnorm.py) vs the vectorized formula | 0.000e+00 |
 | GELU (tanh form) | [`11-gelu.cu`](cuda/11-gelu.cu) | [`09-gelu.py`](triton/09-gelu.py) | [`11-gelu.py`](reference/11-gelu.py) vs exact erf GELU | 4.733e-04 |
-| Flash attention | [`12-flash-attention.cu`](cuda/12-flash-attention.cu) | [`06-fused-attention.py`](triton/06-fused-attention.py) | [`12-flash-attention.py`](reference/12-flash-attention.py) vs full `softmax(QKᵀ/√d)V` | 5.551e-16 |
+| Flash attention | [`12-flash-attention.cu`](cuda/12-flash-attention.cu) | [`06-fused-attention.py`](triton/06-fused-attention.py) | [`12-flash-attention.py`](reference/12-flash-attention.py) vs full `softmax(QKᵀ/√d)V` | 5.551e-16 or 1.071e-07 |
 | Batched GEMM | [`13-batched-gemm.cu`](cuda/13-batched-gemm.cu) | — | [`13-batched-gemm.py`](reference/13-batched-gemm.py) vs `np.matmul` | 0.000e+00 |
 | GEMM + bias + ReLU (fused epilogue) | [`14-relu-fused-bias.cu`](cuda/14-relu-fused-bias.cu) | — | [`14-relu-fused-bias.py`](reference/14-relu-fused-bias.py) vs `np.maximum(x @ w + bias, 0)` | 0.000e+00 |
 | Argmax (warp shuffle) | [`15-argmax-reduction.cu`](cuda/15-argmax-reduction.cu) | — | [`15-argmax-reduction.py`](reference/15-argmax-reduction.py) vs `np.argmax` | 0.0e+00 |
@@ -61,11 +61,13 @@ file.
 | Dropout | — | [`08-dropout.py`](triton/08-dropout.py) | none yet | — |
 | int8 GEMM with scales | — | [`10-int8-matmul.py`](triton/10-int8-matmul.py) | none yet | — |
 
-- The values are what CI prints on Linux with NumPy 2.5.4 (the Python 3.12 and 3.13 jobs). The inputs are
-  seeded, so a rerun on the same setup prints the same values.
-- The GEMM and flash attention rows can change a little with the NumPy version and the BLAS library. With
-  NumPy 2.5 the flash attention check computes in float64, so its error is near 1e-16. The Python 3.10 job
-  gets NumPy 2.2.6 and prints 1.071e-07 for it.
+- These are the values the checks print in CI on Linux. The inputs are seeded.
+- Three rows show two values. Some CI machines print the first value and others print the second, because
+  NumPy's float32 matmul (`a @ b`, and `QKᵀ` in flash attention) can add the products in a different order
+  on different hardware. The other rows print the same value on every machine tested (six CI jobs and a Mac).
+- Flash attention: NumPy 2 turns the float32 scores into float64 when it scales them by `1/np.sqrt(d)`, so
+  the rest of the check runs in float64. When the tiled and the full path get the same float32 scores from
+  `QKᵀ`, the error is near 1e-16. When the matmul adds in a different order, it is near 1e-7.
 - GELU: both kernels use the tanh approximation, and the check compares it with exact erf GELU. So 4.733e-04
   is the error of the approximation, not a rounding error.
 - Argmax compares indices. 0.0e+00 means every row picked the same index as `np.argmax`.
