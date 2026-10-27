@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+
+# nvcc build outputs
+build/
+*.o
+*.out
+*.ptx
+*.cubin
+*.fatbin

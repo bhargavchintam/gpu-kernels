@@ -1,0 +1,45 @@
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: reference checks (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -r requirements.txt
+      - run: python check_all.py
+
+  nvcc:
+    # Compiles and links every kernel with its host harness. GitHub runners have no GPU, so nothing runs.
+    name: nvcc build (CUDA 12.6, no GPU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container: nvidia/cuda:12.6.3-devel-ubuntu24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build every cuda/*.cu
+        shell: bash
+        run: |
+          nvcc --version
+          mkdir -p build
+          for f in cuda/*.cu; do
+            echo "nvcc -O2 $f"
+            nvcc -O2 -o "build/$(basename "$f" .cu)" "$f"
+          done
+          echo "built $(ls build | wc -l) of $(ls cuda/*.cu | wc -l) files"
