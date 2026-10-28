@@ -119,7 +119,7 @@ kernel and a Python function that launches it on PyTorch CUDA tensors, for examp
 
 Contributions are welcome: a new kernel, a NumPy check for one of the Triton-only kernels, or a fix. A new
 kernel comes with a NumPy check, so CI can test it. See [CONTRIBUTING.md](CONTRIBUTING.md) for the steps and a
-list of open ideas.
+list of open ideas. Issues and pull requests have short templates, and everyone here follows the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 

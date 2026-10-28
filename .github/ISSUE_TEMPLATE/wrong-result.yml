@@ -1,0 +1,25 @@
+name: Report a wrong result
+description: A kernel or reference fails, does not build, or prints a number that does not match the README
+body:
+  - type: input
+    id: file
+    attributes:
+      label: File
+      placeholder: cuda/08-softmax.cu
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Command and output
+      description: The command you ran (nvcc, the binary, or python3) and everything it printed.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: GPU, CUDA and Python versions
+      placeholder: RTX 4090, CUDA 12.6, Python 3.12 (or no GPU, reference only)
+    validations:
+      required: true

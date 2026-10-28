@@ -56,11 +56,14 @@ If you have a GPU, run the binary and paste its PASS line in the pull request.
   and int8 GEMM (`triton/10-int8-matmul.py`).
 - A GPU test for the Triton kernels that compares each one with PyTorch and skips when there is no GPU.
 
-Open an issue first if you want to discuss an idea before writing it.
+Open an issue first, with the **Propose a kernel** form, if you want to discuss an idea before writing it.
 
 ## Pull requests
 
 - One kernel or topic per pull request.
 - Say what the reference compares against, and paste its PASS line.
 - If you add timings, say which GPU, CUDA version and problem size they come from.
+- The pull request template asks for the PASS line and the last line of `check_all.py`.
+- Everyone here follows the [code of conduct](CODE_OF_CONDUCT.md). Report a security problem by email, as
+  [SECURITY.md](SECURITY.md) says, not in a public issue.
 - By contributing you agree that your work is released under the [MIT License](LICENSE).
