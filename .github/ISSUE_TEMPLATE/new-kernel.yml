@@ -1,0 +1,32 @@
+name: Propose a kernel
+description: A new CUDA or Triton kernel, or a NumPy reference for an existing one
+title: "Add "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A new kernel comes with a NumPy reference that checks the same algorithm on the CPU, so CI can test it. CONTRIBUTING.md has the steps.
+  - type: textarea
+    id: algorithm
+    attributes:
+      label: Kernel and algorithm
+      description: What the kernel computes, and how the work is split across threads and blocks (tiles, loop order or reduction tree).
+    validations:
+      required: true
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference check
+      description: The plain NumPy expression the reference compares against, and the tolerance you expect.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - CUDA kernel (cuda/)
+        - Triton kernel (triton/)
+        - NumPy reference only (reference/)
+    validations:
+      required: true
